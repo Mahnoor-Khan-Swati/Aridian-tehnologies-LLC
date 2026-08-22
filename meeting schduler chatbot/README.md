@@ -1,64 +1,163 @@
-# Cal.com Booking Assistant (Streamlit)
+# 🏦 HBL Bank Assistant (RAG + Gemini + Upstash Vector)
 
-A chatbot-style Streamlit app that lets a visitor **schedule**, **update (reschedule)**,
-or **cancel** a meeting on your Cal.com event type — all through natural chat buttons,
-using the Cal.com API v2.
+Ek simple **RAG (Retrieval-Augmented Generation)** chatbot jo aapki bank
+document (PDF) parh kar us par sawalon ke jawab deta hai — Google
+**Gemini** LLM aur **Upstash Vector** database ke saath.
 
-## ⚠️ Security first
-Your original message contained a **live Cal.com API key in plain text**. Since it was
-shared in this conversation, consider it compromised:
-1. Go to Cal.com → **Settings → Developer → API Keys**
-2. Delete/refresh that key and generate a new one
-3. Put the *new* key only in your local `.env` file — never in chat, code, or GitHub
+---
 
-## Setup
+## 🧠 Ye kaam kaise karta hai (Road Map)
 
+```
+Your PDF
+   ↓
+document_loader.py        →  PDF parh kar text nikalta hai
+   ↓
+text_splitter.py          →  Text ko chhote chunks mein todta hai
+   ↓
+vector_store.py           →  Chunks ko Upstash Vector mein save karta hai
+   ↓                          (embedding Upstash khud banata hai)
+   ↓
+[User sawal poochta hai]
+   ↓
+vector_store.py (retriever)  →  Sawal se related chunks Upstash se dhoondta hai
+   ↓
+llm_chain.py               →  Chunks + sawal ko Gemini ko bhejta hai
+   ↓
+Gemini                     →  Sirf document ke context se jawab deta hai
+   ↓
+app.py (Streamlit)         →  Jawab user ko screen par dikhata hai
+```
+
+---
+
+## 📁 Project Structure
+
+```
+hbl-bank-assistant/
+├── app.py                     # Sirf UI + modules ko connect karta hai (thin layer)
+├── src/
+│   ├── config.py               # .env se saari settings/keys ek jagah load karta hai
+│   ├── document_loader.py      # PDF load karta hai
+│   ├── text_splitter.py        # Text ko chunks mein todta hai
+│   ├── vector_store.py         # Upstash Vector: save + search
+│   └── llm_chain.py             # Gemini LLM + prompt + answer generation
+├── bank_documents/
+│   └── HBL.pdf                 # <-- Apna PDF yahan rakhein (yeh khud add karein)
+├── .env.example                # Env variables ka template
+├── .gitignore
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## ✅ Setup — Step by Step (A to Z)
+
+### 1. Project folder mein jayein
 ```bash
-cd cal_chatbot
+cd hbl-bank-assistant
+```
+
+### 2. Virtual environment banayein (recommended)
+```bash
 python -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
+
+# Windows:
+venv\Scripts\activate
+
+# Mac/Linux:
+source venv/bin/activate
+```
+
+### 3. Dependencies install karein
+```bash
 pip install -r requirements.txt
-cp .env.example .env          # then edit .env with your real API key
 ```
 
-Fill in `.env`:
+### 4. Gemini API Key hasil karein
+1. https://aistudio.google.com/app/apikey par jayein.
+2. "Create API Key" par click karein aur key copy kar lein.
+
+### 5. Upstash Vector Index banayein
+1. https://console.upstash.com/vector par jayein aur login/signup karein.
+2. **Create Index** par click karein.
+3. Index ka naam dein (jaise `hbl-assistant`).
+4. **Region**: sabse qareeb wala select karein (jaise `us-east-1`).
+5. **Embedding Model** section mein koi bhi embedding model select
+   karein (jaise `mxbai-embed-large-v1`) — is se Upstash khud text ko
+   vectors mein convert karega, aapko koi alag embedding library
+   install karne ki zaroorat nahi.
+6. Index create hone ke baad, index par click karein aur **Details**
+   tab se `UPSTASH_VECTOR_REST_URL` aur `UPSTASH_VECTOR_REST_TOKEN`
+   copy kar lein.
+
+### 6. `.env` file banayein
+```bash
+# .env.example ko copy karke .env banayein
+cp .env.example .env        # Mac/Linux
+copy .env.example .env      # Windows
 ```
-CAL_API_KEY=cal_live_xxxxxxxxxxxxxxxx
-CAL_EVENT_TYPE_ID=6671003        # the numeric ID of your Cal.com event type
-TIMEZONE=Asia/Karachi
-MEETING_TITLE=Quick Meeting
+
+Ab `.env` file kholein aur teen values bharein:
+```env
+GOOGLE_API_KEY=apni_gemini_key_yahan_dalein
+UPSTASH_VECTOR_REST_URL=apna_upstash_url_yahan_dalein
+UPSTASH_VECTOR_REST_TOKEN=apna_upstash_token_yahan_dalein
 ```
 
-**Finding your Event Type ID:** open the event type in Cal.com's dashboard — the ID is
-in the URL (`app.cal.com/event-types/6671003`), or call `GET /v2/event-types` with your
-API key to list them.
+### 7. Apni bank PDF add karein
+`bank_documents/` folder ke andar apni PDF file rakhein aur naam
+`HBL.pdf` rakhein (ya `src/config.py` mein `pdf_path` change kar dein).
 
-## Run
-
+### 8. App run karein
 ```bash
 streamlit run app.py
 ```
 
-## How it works
+Browser mein `http://localhost:8501` khud khul jayega.
 
-- `cal_client.py` — all Cal.com API v2 calls (get slots, create booking, list bookings,
-  reschedule, cancel), each wrapped so failures raise a single `CalApiError`.
-- `app.py` — the chat UI and conversation flow (a small state machine kept in
-  `st.session_state`), styled to resemble a dark chat widget.
+### 9. Sawal poochein
+Pehli baar run karne par PDF process ho kar Upstash mein save hoga
+(thoda time lagega). Agli baar app fori (instant) load hogi kyunke
+data pehle se Upstash mein maujood hai — dobara process nahi hoga.
 
-### Conversation flow
-1. Bot asks for name, then email.
-2. Bot shows a menu: **Schedule / Update / Cancel / Something else**.
-3. **Schedule** → pick a date → bot fetches real open slots from Cal.com → pick a time →
-   booking is created (`POST /v2/bookings`).
-4. **Update** → bot looks up the visitor's upcoming bookings by email → pick one → pick a
-   new date/time → booking is moved (`POST /v2/bookings/{uid}/reschedule`).
-5. **Cancel** → same lookup → pick a booking → confirm → booking is cancelled
-   (`POST /v2/bookings/{uid}/cancel`).
+---
 
-## Notes
-- Booking lookups for update/cancel filter Cal.com's upcoming-bookings list by the
-  attendee email the user typed in chat — no login/auth flow beyond that.
-- `CAL_EVENT_TYPE_ID` must belong to your Cal.com account and its API key.
-- If you get a `404` from Cal.com, double check the `cal-api-version` header requirement
-  hasn't changed — Cal.com versions endpoints independently.
+## ⚙️ Optional Settings (`.env` mein)
+
+| Variable | Default | Matlab |
+|---|---|---|
+| `UPSTASH_NAMESPACE` | `hbl-handbook` | Upstash index ke andar data ka group/section |
+| `CHUNK_SIZE` | `1200` | Har chunk mein kitne characters honge |
+| `CHUNK_OVERLAP` | `200` | Chunks ke darmiyan overlap (context na tootey) |
+| `RETRIEVER_K` | `5` | Har sawal ke liye kitne chunks retrieve honge |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Konsa Gemini model use ho |
+
+---
+
+## 🔁 Naya data dobara index karna ho to?
+
+Agar aap PDF change karein aur chahte hain ke naye data se dobara
+index ho, to Upstash Console se us namespace ka data delete kar dein
+(ya `.env` mein `UPSTASH_NAMESPACE` ka naam change kar dein) — agli
+baar app run karne par naya data automatically upload ho jayega.
+
+---
+
+## 🛠️ Common Issues
+
+| Problem | Solution |
+|---|---|
+| `GOOGLE_API_KEY nahi mila` | `.env` file check karein, key sahi se paste hui ho |
+| `UPSTASH_VECTOR_REST_URL/TOKEN missing` | Upstash Console → Vector → Index → Details se dobara copy karein |
+| `PDF nahi mila` | `bank_documents/HBL.pdf` file mojood honi chahiye |
+| Slow first run | Normal hai — pehli dafa PDF process + Upstash upload ho raha hota hai |
+
+---
+
+## 📌 Note
+
+Yeh project sirf ek reference/demo tool hai. HBL ke official aur
+binding terms hamesha **www.hbl.com** aur official branch se confirm
+karein.
