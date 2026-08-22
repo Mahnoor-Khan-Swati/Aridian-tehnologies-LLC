@@ -1,0 +1,14 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Your actual bank PDF (optional — remove this line if you WANT to commit it)
+bank_documents/*.pdf
