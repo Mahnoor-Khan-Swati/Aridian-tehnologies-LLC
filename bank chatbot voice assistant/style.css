@@ -1,0 +1,527 @@
+/* HBL Voice Assistant - UI (screenshot jaisa) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap');
+
+:root {
+    --green: #08765D;
+    --dark-green: #064C3D;
+    --light-green: #E5F4EE;
+    --background: #F0F8F5;
+    --border: #D5E9E0;
+    --text: #172F28;
+    --muted: #658076;
+    --danger: #B3261E;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--background);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+    width: 280px;
+    flex: 0 0 280px;
+    background: linear-gradient(180deg, #075B49, #043E32);
+    padding: 18px 14px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.logo {
+    text-align: center;
+    color: #fff;
+    padding: 22px 0 26px;
+}
+
+.logo b {
+    display: block;
+    font-size: 38px;
+    letter-spacing: 3px;
+}
+
+.logo small {
+    font-size: 12px;
+    line-height: 1.6;
+    opacity: .9;
+}
+
+.nav button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 4px 0;
+    padding: 12px 14px;
+    background: transparent;
+    border: 0;
+    border-radius: 10px;
+    color: #fff;
+    font: 500 14px Inter, sans-serif;
+    cursor: pointer;
+    text-align: left;
+}
+
+.nav button:hover {
+    background: rgba(255, 255, 255, .15);
+}
+
+.nav button.active {
+    background: rgba(255, 255, 255, .2);
+}
+
+.nav svg {
+    width: 16px;
+    height: 16px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------- Main ---------- */
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 18px 26px 30px;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.banner {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #E1F1EB;
+    border: 1px solid #CEE5DA;
+    border-radius: 15px;
+    padding: 16px 24px;
+    margin-bottom: 15px;
+}
+
+.banner-icon {
+    font-size: 28px;
+}
+
+.banner-title {
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.banner-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 26px;
+    padding: 26px 30px;
+    box-shadow: 0 8px 30px rgba(5, 74, 55, .035);
+    margin-bottom: 18px;
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+/* ---------- Live call ---------- */
+.live-eyebrow {
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.live-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 8px;
+}
+
+.live-subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.timer {
+    margin-top: 18px;
+    font-weight: 800;
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+}
+
+.timer small {
+    display: block;
+    margin-top: 1px;
+    color: #6c837a;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: .12em;
+}
+
+.call-area {
+    text-align: center;
+    padding-bottom: 6px;
+}
+
+.voice-stage {
+    position: relative;
+    margin: 6px auto 4px;
+    width: 230px;
+    height: 230px;
+    display: grid;
+    place-items: center;
+}
+
+.halo {
+    position: absolute;
+    border-radius: 50%;
+    background: #e7f5ef;
+    inset: 14px;
+    transform: scale(.95);
+    opacity: .75;
+    transition: transform .09s ease, opacity .15s ease;
+}
+
+.halo.second {
+    inset: 0;
+    background: #eef8f3;
+    opacity: .52;
+}
+
+.mic {
+    width: 152px;
+    height: 152px;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    border: 0;
+    cursor: pointer;
+    background: var(--green);
+    color: #fff;
+    box-shadow: 0 9px 30px rgba(8, 107, 85, .18);
+    transition: transform .2s ease, background .25s ease;
+}
+
+.mic:hover {
+    transform: scale(1.03);
+}
+
+.mic:focus-visible {
+    outline: 4px solid rgba(8, 118, 93, .35);
+    outline-offset: 4px;
+}
+
+.mic svg {
+    width: 46px;
+    height: 46px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.mic .icon-end {
+    display: none;
+}
+
+.in-call .mic .icon-mic {
+    display: none;
+}
+
+.in-call .mic .icon-end {
+    display: block;
+}
+
+.in-call .mic {
+    background: #0a6a54;
+}
+
+.phase-hearing .mic {
+    background: #0b8a6b;
+}
+
+.phase-speaking .mic {
+    background: #075B49;
+}
+
+.status {
+    min-height: 22px;
+    margin: 6px 0 10px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.status.error {
+    color: var(--danger);
+}
+
+.wave {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    height: 44px;
+    margin: 4px 0 12px;
+}
+
+.wave i {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--green);
+    transition: height .08s linear;
+    opacity: .9;
+}
+
+.end-btn {
+    display: none;
+    margin: 0 auto;
+    padding: 12px 54px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--danger);
+    color: #fff;
+    font: 700 14px Inter, sans-serif;
+    cursor: pointer;
+}
+
+.in-call .end-btn {
+    display: inline-block;
+}
+
+.hint {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 12.5px;
+}
+
+/* ---------- Language selector ---------- */
+.lang {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.lang button {
+    border: 1px solid var(--border);
+    background: #fbfefd;
+    color: var(--text);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font: 600 13px 'Noto Naskh Arabic', Inter, sans-serif;
+    cursor: pointer;
+}
+
+.lang button.on {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+}
+
+/* ---------- Transcript ---------- */
+.transcript-heading {
+    display: flex;
+    justify-content: space-between;
+    color: #587367;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+
+.empty-note {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.chat-bubble {
+    padding: 14px 20px;
+    border-radius: 24px;
+    max-width: 85%;
+    margin: 14px 0;
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+    font-family: 'Noto Naskh Arabic', Inter, sans-serif;
+    font-size: 16px;
+}
+
+.chat-bubble.customer {
+    background: var(--green);
+    color: #fff;
+    margin-left: auto;
+}
+
+.chat-bubble.agent {
+    background: #F4FAF7;
+    color: var(--text);
+    border: 1px solid var(--border);
+    margin-right: auto;
+}
+
+.chat-bubble small {
+    display: block;
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    margin-bottom: 3px;
+    opacity: .72;
+}
+
+.caption {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* ---------- Other pages ---------- */
+.row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.row input[type=text] {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font: 15px Inter, sans-serif;
+    background: #fff;
+}
+
+.btn {
+    padding: 12px 22px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--green);
+    color: #fff;
+    font: 700 14px Inter, sans-serif;
+    cursor: pointer;
+}
+
+.btn.ghost {
+    background: var(--light-green);
+    color: var(--dark-green);
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.result {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    background: #fbfefd;
+    white-space: pre-wrap;
+    line-height: 1.7;
+}
+
+.result b {
+    color: var(--green);
+}
+
+.faq-item {
+    margin-bottom: 10px;
+}
+
+.faq-item>button {
+    width: 100%;
+    text-align: left;
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fbfefd;
+    font: 600 14px Inter, sans-serif;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.faq-item>button:hover {
+    background: var(--light-green);
+}
+
+.faq-answer {
+    padding: 10px 16px;
+    line-height: 1.8;
+    font-family: 'Noto Naskh Arabic', Inter, sans-serif;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 860px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        flex: none;
+        height: auto;
+        position: static;
+        padding: 10px;
+    }
+
+    .logo {
+        padding: 8px 0 10px;
+    }
+
+    .logo b {
+        font-size: 28px;
+    }
+
+    .nav {
+        display: flex;
+        overflow-x: auto;
+        gap: 4px;
+    }
+
+    .nav button {
+        white-space: nowrap;
+        width: auto;
+    }
+
+    .main {
+        padding: 12px;
+    }
+
+    .card {
+        padding: 20px 16px;
+    }
+}

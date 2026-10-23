@@ -1,0 +1,24 @@
+streamlit
+python-dotenv
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-openai
+langchain-huggingface
+sentence-transformers
+upstash-vector
+pypdf
+openai
+audio-recorder-streamlit
+
+# Voice server
+fastapi
+uvicorn[standard]
+python-multipart
+numpy
+scipy
+supabase
+
+# Cartesia TTS
+requests>=2.31.0
