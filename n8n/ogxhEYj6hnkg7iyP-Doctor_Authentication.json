@@ -1,0 +1,153 @@
+{
+  "name": "Doctor Authentication",
+  "nodes": [
+    {
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        288
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "doctor_id",
+              "type": "number"
+            },
+            {
+              "name": "cnic"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bf06fad3-501f-4a9c-8639-0e13063e5aae",
+      "name": "Crypto",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        336,
+        272
+      ],
+      "parameters": {
+        "value": "={{ $json.cnic }}",
+        "dataPropertyName": "cnic_hash"
+      }
+    },
+    {
+      "id": "b97920d6-3a4a-40e6-bf46-502928ab4b6d",
+      "name": "Get a row",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        560,
+        288
+      ],
+      "parameters": {
+        "operation": "get",
+        "tableId": "doctors",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.doctor_id }}"
+            },
+            {
+              "keyName": "cnic_hash",
+              "keyValue": "={{ $json.cnic_hash }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      },
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "510f43e7-0023-462d-b82c-606f1160638e",
+      "name": "verified",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        784,
+        288
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d4f6b3a-6d6b-4960-873b-f095c445a2f6",
+              "name": "doctor_id",
+              "value": "={{ $json.id || $('When Executed by Another Workflow').item.json.doctor_id }}",
+              "type": "number"
+            },
+            {
+              "id": "fb968593-211d-4e58-8a13-6d34c0c752b5",
+              "name": "verified",
+              "value": "={{ !!$json.id }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "verified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

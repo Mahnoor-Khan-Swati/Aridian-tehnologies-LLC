@@ -1,0 +1,1503 @@
+{
+  "name": "Hospital AI Assistant - Complete Starter",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "id": "ec256718-2165-46de-b3dc-80eae652be27",
+      "name": "Hospital Chat",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1472,
+        0
+      ],
+      "webhookId": "7b513c32-f1fa-4215-b9a4-99bab2156044"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the Hospital AI Assistant. Be friendly and helpful.\nGreet users, answer questions about doctors, services, schedules, appointments,\nand general hospital FAQs using the available tools. Never invent data — always\nuse the tools to look things up.\n\nPUBLIC information (no authentication needed):\n- Doctors, specializations, departments, availability\n- Hospital services and fees\n- Doctor working schedules\n- Appointments (view and create)\n- General hospital FAQs\n\nPRIVATE information — SALARY and ATTENDANCE (authentication is MANDATORY):\n\nSalary and attendance are strictly private. You must NEVER reveal them,\nand you must NEVER call the \"Get Doctor Salary\" or \"Get Doctor Attendance\"\ntools, until authentication has SUCCEEDED in the current conversation.\n\nFollow these steps exactly when a user asks about salary or attendance:\n\n1. If the Doctor ID or CNIC is missing, reply ONLY with:\n   \"This is private information. Please provide your Doctor ID and CNIC to verify your identity.\"\n   Do NOT call any salary or attendance tool at this point.\n\n2. When BOTH Doctor ID and CNIC are provided, you MUST first call the\n   authentication tool \"Call 'My Sub-Workflow 2'2\", passing:\n     doctor_id = the Doctor ID supplied by the user (as a number)\n     cnic      = the CNIC supplied by the user (exactly as given)\n\n3. Read the tool's result:\n   - If it returns verified = true, authentication SUCCEEDED. Only then may you\n     call \"Get Doctor Salary\" or \"Get Doctor Attendance\", and only for that same\n     verified doctor_id.\n   - If it returns verified = false (or no match), reply ONLY with:\n     \"Authentication failed. Please check your Doctor ID and CNIC.\"\n     Do NOT call any salary or attendance tool.\n\n4. NEVER call \"Get Doctor Salary\" or \"Get Doctor Attendance\" before the\n   authentication tool has returned verified = true in this conversation.\n\n5. Never repeat, echo, or expose the CNIC or CNIC hash in your response."
+        }
+      },
+      "id": "210989cb-ee9b-494a-96e6-171b8ac2f242",
+      "name": "Hospital AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1040,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o",
+          "cachedResultUrl": ""
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "97811cbb-5c45-45c2-b0c1-3cf601758a2f",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1184,
+        -80
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "4eleqYrBMW2ZW0B3",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "id": "842e0df9-28a7-4ae6-8e0d-0ea0ca8fdd09",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1184,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get many rows in SupabaseUse this tool to retrieve hospital services from the services table.\nUse it when a user asks about available hospital services, departments,\nservice details, prices, or availability.\nDo not invent service information. Use the data returned by this tool.",
+        "operation": "getAll",
+        "tableId": "services"
+      },
+      "id": "c404a9ce-f340-4f16-aead-0d220c7d210d",
+      "name": "services",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        224
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve doctor information from the doctors table.\nUse it when a user asks about doctors, doctor names, specializations,\ndepartments, or doctor availability.\nDo not invent doctor information. Use only the data returned by this tool.",
+        "operation": "getAll",
+        "tableId": "doctors"
+      },
+      "id": "b8dcb269-fff3-42e4-b2eb-f3fbd5619c23",
+      "name": "docter",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        224
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve doctor information from the doctors table.\nUse it when users ask about doctors, names, specializations,\ndepartments, or availability.\nUse only information returned by this tool.",
+        "operation": "getAll",
+        "tableId": "doctors"
+      },
+      "id": "f6736761-471d-421b-9edc-1a2caea973fa",
+      "name": "Get Doctors",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        320
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve doctors' working schedules from the\ndoctor_schedule table. Use it when a user asks about a doctor's\nworking day, start time, end time, schedule, or availability.\nUse only information returned by this tool.",
+        "operation": "getAll",
+        "tableId": "doctor_schedule"
+      },
+      "id": "b6e92062-fb5c-4764-b942-bedb4141406b",
+      "name": "Get Doctor Schedule",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        224
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve general hospital information and frequently\nasked questions from the hospital_faq table. Use it when users ask\nabout hospital information, policies, facilities, opening hours,\ncontact information, emergency information, or general questions.\nUse only information returned by this tool and do not invent hospital facts.",
+        "operation": "getAll",
+        "tableId": "hospital_faq"
+      },
+      "id": "fbba9d74-f014-4e31-b0a0-3bcda37bcdd6",
+      "name": "Get many rows in Supabase",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        336
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve appointment information from the appointments\ntable. Use it when checking appointments, appointment dates, appointment\ntimes, doctors, patients, reasons, or appointment status.\nUse only information returned by this tool.",
+        "tableId": "appointments"
+      },
+      "id": "10c681d7-8f76-4c9c-9a38-c9e8ab937072",
+      "name": "Get Appointments",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        224
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to create a new hospital appointment.\nBefore using it, make sure the patient ID, doctor ID,\nappointment date, appointment time, and reason are known.\nSet the appointment status to pending.\nDo not invent patient IDs or doctor IDs.",
+        "tableId": "appointments",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "patient_id",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues0_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "doctor_id",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues1_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "appointment_date",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', `Appointment date only. Must be in YYYY-MM-DD format.\nExample: 2026-11-25.\nNever put patient ID or doctor ID in this field.`, 'string') }}"
+            },
+            {
+              "fieldId": "reason",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "=pending"
+            },
+            {
+              "fieldId": "appointment_time",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues5_Field_Value', `patient_id\nDescription:\nPatient ID only. Must be an integer. Example: 2.\n\ndoctor_id\nDescription:\nDoctor ID only. Must be an integer. Example: 1.\n\nappointment_date\nDescription:\nAppointment date only in YYYY-MM-DD format. Example: 2026-11-12.\n\nreason\nDescription:\nReason for the appointment as text. Example: heart patient.\n\nstatus\nFixed value:\npending\n\nappointment_time\nDescription:\nAppointment time only. Use HH:MM:SS 24-hour format. Example: 10:00:00.\nNever put the appointment reason in this field.`, 'string') }}"
+            }
+          ]
+        }
+      },
+      "id": "bb947424-0c6a-41f0-8fc2-2c55ca41a1ea",
+      "name": "appontments",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        224
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve patient records from the patients table.\nUse it when patient information is required for hospital operations\nsuch as identifying a patient before booking an appointment.\nDo not invent patient IDs or patient information.",
+        "operation": "getAll",
+        "tableId": "patients"
+      },
+      "id": "ef8b601f-6687-4baa-a231-ab8f5329ab4d",
+      "name": "Get many rows in Supabase1",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        368
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve a doctor's attendance records.\n\nThis tool is for private doctor information.\nOnly use it after the doctor's identity has been successfully verified.\nRetrieve records only for the authenticated doctor.\nNever use a doctor ID supplied by another user to access private records.",
+        "operation": "getAll",
+        "tableId": "attendance"
+      },
+      "id": "e92174de-df34-4e42-8c58-90f4aef98fad",
+      "name": "Get Doctor Attendance",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        224
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Retrieve salary information for an authenticated doctor. Use this tool only after the doctor's identity has been successfully verified. Never use it to access another doctor's salary.",
+        "operation": "getAll",
+        "tableId": "doctor_salary",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "doctor_id",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('conditions0_Field_Value', `Use the doctor_id of the doctor whose authentication session has already been successfully verified. Never use another doctor's ID.`, 'number') }}"
+            }
+          ]
+        }
+      },
+      "id": "27f54442-5a63-4f5e-b190-ee66be966c36",
+      "name": "Get Doctor Salary",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        0,
+        320
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Check whether a doctor has a valid verified authentication session before accessing private information such as salary or attendance.",
+        "operation": "getAll",
+        "tableId": "auth_sessions",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "doctor_id",
+              "condition": "eq",
+              "keyValue": "=1"
+            },
+            {
+              "keyName": "verified",
+              "condition": "eq",
+              "keyValue": "true"
+            },
+            {
+              "keyName": "expires_at",
+              "condition": "gte",
+              "keyValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "2f6ec5fc-8105-44c9-afab-66bcb3185167",
+      "name": "check whether a valid session already exists:",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        96,
+        224
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "auth_sessions",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "doctor_id",
+              "fieldValue": "1"
+            },
+            {
+              "fieldId": "session_token",
+              "fieldValue": "test_session_123"
+            },
+            {
+              "fieldId": "verified",
+              "fieldValue": "true"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ $now.plus({ minutes: 30 }).toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "99ed7afb-aa51-4695-a174-232737fed8c0",
+      "name": "auth_sessions",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        256,
+        224
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "doctors",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Field_Value', `The doctor ID provided by the user for identity verification.`, 'string') }}"
+            },
+            {
+              "keyName": "cnic_hash",
+              "condition": "eq",
+              "keyValue": "acb85598247cea13698e449f3da7b83080b59931296ae54b012533316f47398e"
+            }
+          ]
+        }
+      },
+      "id": "96552cf6-4ec6-4408-b6dc-a034490bc4ef",
+      "name": "Verify Doctor",
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        32,
+        608
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "MANDATORY authentication tool for private doctor data.\n\nWhen the user requests salary or attendance and both Doctor ID\nand CNIC are available, call this tool BEFORE any salary or\nattendance tool.\n\nPass doctor_id as a number and cnic exactly as supplied.\n\nIf either is missing, ask for it.\nNever reveal CNIC or CNIC hash.",
+        "workflowId": {
+          "__rl": true,
+          "value": "ogxhEYj6hnkg7iyP",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ogxhEYj6hnkg7iyP",
+          "cachedResultName": "Doctor Authentication"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "doctor_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('doctor_id', `The Doctor ID provided by the user for authentication. Call this tool only when private doctor information is requested and both Doctor ID and CNIC have been provided.`, 'number') }}",
+            "cnic": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('cnic', `The CNIC provided by the user for authentication. Pass it exactly to the authentication workflow. Never repeat or expose it in the response.`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "doctor_id",
+              "displayName": "doctor_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "cnic",
+              "displayName": "cnic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "3ce895cd-8637-4526-b391-5a679bd8c9de",
+      "name": "Call 'My Sub-Workflow 2'2",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Hospital Doctor Registration",
+        "formDescription": "Enter the doctor's official hospital working schedule.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Doctor Name"
+            },
+            {
+              "fieldLabel": "Specialization"
+            },
+            {
+              "fieldLabel": "Phone"
+            },
+            {
+              "fieldLabel": "Email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ee1ed428-fd84-4de8-8966-671d48bf1dde",
+      "name": "Hospital Doctor Registration",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        656,
+        352
+      ],
+      "webhookId": "2b8091e4-8c85-4766-bbf8-e08d0108756d"
+    },
+    {
+      "parameters": {
+        "tableId": "doctors",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json['Doctor Name'] }}"
+            },
+            {
+              "fieldId": "specialization",
+              "fieldValue": "={{ $json.Specialization }}"
+            },
+            {
+              "fieldId": "department",
+              "fieldValue": "={{ $json[' Department'] }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.Phone }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "available",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "fdfc52c7-9c45-4c1c-bb8a-5ee004f9714d",
+      "name": "Create a row",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        816,
+        352
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Service Registration",
+        "formDescription": "Enter the official hospital service information.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Service Name"
+            },
+            {
+              "fieldLabel": "Department"
+            },
+            {
+              "fieldLabel": " Fee"
+            },
+            {
+              "fieldLabel": "description"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "203a2520-b956-4336-b3ee-cbc40af348b0",
+      "name": "Service Registration",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        656,
+        208
+      ],
+      "webhookId": "9d954e95-e811-45de-b462-495fdb6c9664"
+    },
+    {
+      "parameters": {
+        "tableId": "services",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "service_name",
+              "fieldValue": "={{ $json['Service Name'] }}"
+            },
+            {
+              "fieldId": "department",
+              "fieldValue": "={{ $json.Department }}"
+            },
+            {
+              "fieldId": "fee",
+              "fieldValue": "={{ $json[' Fee'] }}"
+            },
+            {
+              "fieldId": "description",
+              "fieldValue": "={{ $json.description }}"
+            },
+            {
+              "fieldId": "available",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "61e499ce-6b06-4df0-bf28-ec2561c77f2f",
+      "name": "Create a row1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        832,
+        208
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Doctor Schedule Registration",
+        "formDescription": "Enter the doctor's official working schedule.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Doctor ID",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Day",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Monday"
+                  },
+                  {
+                    "option": "Tuesday"
+                  },
+                  {
+                    "option": "Wednesday"
+                  },
+                  {
+                    "option": "Thursday"
+                  },
+                  {
+                    "option": "Friday"
+                  },
+                  {
+                    "option": "Saturday"
+                  },
+                  {
+                    "option": "Sunday "
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Start Time"
+            },
+            {
+              "fieldLabel": "End Time"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "43de05d2-cdaf-42cc-a4ed-658f884e7c77",
+      "name": "Doctor Schedule Registration",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        640,
+        48
+      ],
+      "webhookId": "78ec90ed-ef44-4d65-b750-2702712cc9a9"
+    },
+    {
+      "parameters": {
+        "tableId": "doctor_schedule",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "doctor_id",
+              "fieldValue": "={{ $json['Doctor ID'] }}"
+            },
+            {
+              "fieldId": "day",
+              "fieldValue": "={{ $json.Day }}"
+            },
+            {
+              "fieldId": "start_time",
+              "fieldValue": "={{ $json['Start Time'] }}"
+            },
+            {
+              "fieldId": "end_time",
+              "fieldValue": "={{ $json['End Time'] }}"
+            },
+            {
+              "fieldId": "available",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "d3471004-ac6c-4aa1-98d8-bf8cbc691d65",
+      "name": "Create a row2",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        832,
+        48
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Patient Registration",
+        "formDescription": "Enter the patient's information to register the patient in the hospital system.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Patient Name"
+            },
+            {
+              "fieldLabel": "Phone"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Gender"
+            },
+            {
+              "fieldLabel": "Date of Birth"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "63402056-c48f-461d-9803-2d3cec767592",
+      "name": "Patient Registration",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        624,
+        -112
+      ],
+      "webhookId": "eee48344-b816-4f7b-a728-d0f16332e8c3"
+    },
+    {
+      "parameters": {
+        "tableId": "patients",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json['Patient Name'] }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.Phone }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "date_of_birth",
+              "fieldValue": "={{ $json['Date of Birth'] }}"
+            },
+            {
+              "fieldId": "gender",
+              "fieldValue": "={{ $json.Gender }}"
+            }
+          ]
+        }
+      },
+      "id": "a3ec1d1f-65c5-434d-b5a6-07f84f68d70a",
+      "name": "Create a row3",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        848,
+        -112
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Appointment Registration",
+        "formDescription": "Enter the patient's appointment information.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Patient ID",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Doctor ID",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Appointment Date",
+              "fieldType": "date"
+            },
+            {
+              "fieldLabel": "Appointment Time"
+            },
+            {
+              "fieldLabel": "Reason",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Status",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "pending"
+                  },
+                  {
+                    "option": "confirm"
+                  },
+                  {
+                    "option": "complete"
+                  },
+                  {
+                    "option": "cancelled"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e32f3ae5-90f7-440f-9639-a043f793451d",
+      "name": "Appointment Registration",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        1104,
+        352
+      ],
+      "webhookId": "a18b152f-b09a-4ade-adf7-74f77e4903a4"
+    },
+    {
+      "parameters": {
+        "tableId": "appointments",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "patient_id",
+              "fieldValue": "={{ $json['Patient ID'] }}"
+            },
+            {
+              "fieldId": "doctor_id",
+              "fieldValue": "={{ $json['Doctor ID'] }}"
+            },
+            {
+              "fieldId": "appointment_date",
+              "fieldValue": "={{ $json['Appointment Date'] }}"
+            },
+            {
+              "fieldId": "appointment_time",
+              "fieldValue": "={{ $json['Appointment Time'] }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.Status }}"
+            },
+            {
+              "fieldId": "reason",
+              "fieldValue": "={{ $json.Reason }}"
+            }
+          ]
+        }
+      },
+      "id": "b492eedc-c7ad-4007-b59c-64b3acf89702",
+      "name": "Create a row4",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        352
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Doctor Salary Registration",
+        "formDescription": "Enter the doctor's salary information.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Doctor ID",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Month"
+            },
+            {
+              "fieldLabel": "Basic Salary",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Allowance",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Deduction",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Net Salary",
+              "fieldType": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "51cc6206-5197-4892-9ea9-a0b16428998c",
+      "name": "Doctor Salary Registration",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        1104,
+        176
+      ],
+      "webhookId": "cf3ffc3e-24a2-40c0-a2df-6304e3e35f05"
+    },
+    {
+      "parameters": {
+        "tableId": "doctor_salary",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "doctor_id",
+              "fieldValue": "={{ $json['Doctor ID'] }}"
+            },
+            {
+              "fieldId": "month",
+              "fieldValue": "={{ $json.Month }}"
+            },
+            {
+              "fieldId": "basic_salary",
+              "fieldValue": "={{ $json['Basic Salary'] }}"
+            },
+            {
+              "fieldId": "allowance",
+              "fieldValue": "={{ $json.Allowance }}"
+            },
+            {
+              "fieldId": "net_salary",
+              "fieldValue": "={{ $json['Net Salary'] }}"
+            },
+            {
+              "fieldId": "deduction",
+              "fieldValue": "={{ $json.Deduction }}"
+            }
+          ]
+        }
+      },
+      "id": "af6bf143-bea0-42af-b734-68557a0a82bc",
+      "name": "Create a row5",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        176
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Doctor Attendance Registration",
+        "formDescription": "Enter the doctor's daily attendance information.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Doctor ID",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Attendance Date",
+              "fieldType": "date"
+            },
+            {
+              "fieldLabel": "Status",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Present"
+                  },
+                  {
+                    "option": "Absent"
+                  },
+                  {
+                    "option": "Leave"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fff99036-b68b-4730-a361-daa939f358b4",
+      "name": "Doctor Attendance Registration",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        1120,
+        16
+      ],
+      "webhookId": "dd2d80d7-acc0-47b2-a163-0050a2466539"
+    },
+    {
+      "parameters": {
+        "tableId": "attendance",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "doctor_id",
+              "fieldValue": "={{ $json['Doctor ID'] }}"
+            },
+            {
+              "fieldId": "attendance_date",
+              "fieldValue": "={{ $json['Attendance Date'] }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.Status }}"
+            }
+          ]
+        }
+      },
+      "id": "61982db5-02cf-423e-8cbb-f1f0c1ea9a2f",
+      "name": "Doctor Attendance Registration1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        16
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Hospital FAQ Registration",
+        "formDescription": "Add common hospital questions and answers for the AI assistant.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Question"
+            },
+            {
+              "fieldLabel": "Answer",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Category",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "General"
+                  },
+                  {
+                    "option": "Emergency"
+                  },
+                  {
+                    "option": "Appointments"
+                  },
+                  {
+                    "option": "Doctors"
+                  },
+                  {
+                    "option": "Services"
+                  },
+                  {
+                    "option": "Billing"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Active",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "true"
+                  },
+                  {
+                    "option": "false"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "185eda1b-8fa1-4c51-b8e7-49b6ea13562c",
+      "name": "Hospital FAQ Registration",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        1120,
+        -128
+      ],
+      "webhookId": "4b0392e0-6064-457a-a4fd-baa1a9924b32"
+    },
+    {
+      "parameters": {
+        "tableId": "hospital_faq",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "question",
+              "fieldValue": "={{ $json.Question }}"
+            },
+            {
+              "fieldId": "answer",
+              "fieldValue": "={{ $json.Answer }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "={{ $json.Category }}"
+            },
+            {
+              "fieldId": "active",
+              "fieldValue": "={{ $json.Active }}"
+            }
+          ]
+        }
+      },
+      "id": "6bd6a7d7-1ace-453c-9fc7-f698c08c49db",
+      "name": "Hospital FAQ Registration1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        -128
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Hospital Chat": {
+      "main": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "services": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "docter": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Doctors": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Doctor Schedule": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Appointments": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "appontments": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows in Supabase1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Doctor Attendance": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Doctor Salary": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check whether a valid session already exists:": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "auth_sessions": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Doctor": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'My Sub-Workflow 2'2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Hospital AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hospital Doctor Registration": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Service Registration": {
+      "main": [
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Doctor Schedule Registration": {
+      "main": [
+        [
+          {
+            "node": "Create a row2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patient Registration": {
+      "main": [
+        [
+          {
+            "node": "Create a row3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Appointment Registration": {
+      "main": [
+        [
+          {
+            "node": "Create a row4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Doctor Salary Registration": {
+      "main": [
+        [
+          {
+            "node": "Create a row5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Doctor Attendance Registration": {
+      "main": [
+        [
+          {
+            "node": "Doctor Attendance Registration1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hospital FAQ Registration": {
+      "main": [
+        [
+          {
+            "node": "Hospital FAQ Registration1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 9,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

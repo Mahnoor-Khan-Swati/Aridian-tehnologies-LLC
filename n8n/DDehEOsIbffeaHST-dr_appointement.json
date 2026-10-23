@@ -1,0 +1,351 @@
+{
+  "name": "dr appointement",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "1. If a customer asks in Hindi, reply in Hindi.\n   - If in Bengali, reply in Bengali.\n   - If in English, reply in English.\n   (Always reply in the same language the customer uses.)\n\n2. The first welcome message will be:\n   \"Welcome to our learning platform!\n   How can I help you today?\"\n\n3. If the question matches course data:\n   → Show the course name and description.\n\n4. If the question matches FAQ data:\n   → Give the exact FAQ answer.\n\n5. If the information is NOT available in FAQ or Courses:\n   - Do NOT try to create or guess an answer.\n   - Reply:\n     \"I don't have information about your question. Please share your mobile number so that our team can contact you soon.\"\n   - Save the customer's question and the mobile number into the \"Unanswered Queries\" sheet."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        304,
+        -240
+      ],
+      "id": "e1927090-9500-42e2-aabb-20d8c5bfd7bc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        128
+      ],
+      "id": "b32442de-0484-4126-9f6e-ee1d4eab40af",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cQ9mmDhD4u8Xc6b4",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        256,
+        144
+      ],
+      "id": "80dd37f6-b544-44b7-896f-cd80e9d1ad19",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM",
+          "mode": "list",
+          "cachedResultName": "Manish_Digital_Academy_updated",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1412082713,
+          "mode": "list",
+          "cachedResultName": "FAQ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM/edit#gid=1412082713"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        864,
+        128
+      ],
+      "id": "1ba4c8ae-214e-4889-b3f4-258736f80121",
+      "name": "FAQ",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WN8OZskGP8k0vXio",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM",
+          "mode": "list",
+          "cachedResultName": "Manish_Digital_Academy_updated",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 499746500,
+          "mode": "list",
+          "cachedResultName": "Unanswered Queries",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM/edit#gid=499746500"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "give me course detail",
+            "timestamp": "i note your number"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact",
+              "displayName": "contact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "bot_reply",
+              "displayName": "bot_reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "matched_source",
+              "displayName": "matched_source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1088,
+        128
+      ],
+      "id": "06500d58-6bce-4115-8a7c-127d98538241",
+      "name": "QUERY",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BFS5A2Wv4YvZQOVR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM",
+          "mode": "list",
+          "cachedResultName": "Manish_Digital_Academy_updated",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 740846948,
+          "mode": "list",
+          "cachedResultName": "Courses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f0ABR0O1W2MBhNclZUR_Nu8VggS9IPr-zHM-BlNn_HM/edit#gid=740846948"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        96
+      ],
+      "id": "dd04a476-316a-4dc4-aa72-56eb4b35a3ed",
+      "name": "COURSE",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "174t6tz3GZI4a008",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "discord-general-channel",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        -64
+      ],
+      "id": "9c6e675b-0c65-494b-8c3b-8d6d5f406ebf",
+      "name": "Webhook",
+      "webhookId": "527b3ba4-d2b5-4dc4-8204-00ebd6abccd6"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        976,
+        240
+      ],
+      "id": "e164e552-3da5-44a3-b5d8-5c206301e3b4",
+      "name": "Simple Memory1"
+    }
+  ],
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQ": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QUERY": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "COURSE": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {
+    "AI Agent": [
+      {
+        "json": {
+          "output": "Welcome to our learning platform!\nHow can I help you today?"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

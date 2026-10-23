@@ -1,0 +1,406 @@
+{
+  "name": "Project: Customer Complaint Automation System  ### Real-world problem  A company receives customer complaints through a for",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WD_cQQSQm-yU1xcFNu1wthZ5Kwb1oOTZWfIZxmGxpMg",
+          "mode": "list",
+          "cachedResultName": "complaints_sample_data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WD_cQQSQm-yU1xcFNu1wthZ5Kwb1oOTZWfIZxmGxpMg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 256757462,
+          "mode": "list",
+          "cachedResultName": "Complaints",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WD_cQQSQm-yU1xcFNu1wthZ5Kwb1oOTZWfIZxmGxpMg/edit#gid=256757462"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.customer_name }}",
+            "Email": "={{ $json.customer_email }}",
+            "Category": "={{ $json.output.category }}",
+            "Complaint": "={{ $json.complaint }}",
+            "Priority": "={{ $json.output.priority }}",
+            "Status": "={{ $json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Complaint",
+              "displayName": "Complaint",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        -144
+      ],
+      "id": "3d343715-f2a8-40ad-a615-435b78212869",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aVWjfVrQQdaKArO4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "30c189a9-2abc-446c-8223-7de1ed2b0274",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -912,
+        -64
+      ],
+      "id": "2da45d5c-7e78-415f-9546-d9b42ae76c47",
+      "name": "Webhook",
+      "webhookId": "30c189a9-2abc-446c-8223-7de1ed2b0274"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"customer_name\": \"={{ $json.body.name }}\",\n  \"customer_email\": \"={{ $json.body.email }}\",\n  \"complaint\": \"={{ $json.body.complaint }}\"\n}",
+        "includeOtherFields": true,
+        "include": "except",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -720,
+        -64
+      ],
+      "id": "8b21761c-fdbc-48c2-b952-c50123e13148",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this customer complaint:\n{{ $json.complaint }}\n\nProvide a JSON object with:\n- category: (Damaged Product, Late Delivery, Billing, or Other)\n- priority: (High, Medium, Low)\n- short_summary: brief one-sentence summary\n- suggested_reply: a polite, professional response to the customer",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -400,
+        -160
+      ],
+      "id": "ba2a22cd-944d-4b5b-b522-30c02bd83aaf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -544,
+        224
+      ],
+      "id": "0d7aac14-3a53-4c18-8769-60383f45237f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "POXzxcBNwFR16AA0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"category\": \"Damaged Product\",\n  \"priority\": \"High\",\n  \"short_summary\": \"The order arrived late and the product box was torn.\",\n  \"suggested_reply\": \"Dear Customer, we apologize for the damaged package. We are sending a replacement right away.\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        96
+      ],
+      "id": "4f179b48-c317-4c85-90c4-bb4a1925ca9c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        288
+      ],
+      "id": "180a37f8-006a-4b1c-98e3-8f528a79eb64",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "POXzxcBNwFR16AA0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6879ee94-619b-406e-84a3-37b18b0ca212",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "High",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        -32
+      ],
+      "id": "1d11cb02-f0af-4fc1-9fda-bcb300896e2c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "n17940296@gmail.com",
+        "subject": "Update regarding your complaint",
+        "emailType": "text",
+        "message": "=High priority complaint received from {{ $('Edit Fields').item.json.customer_name }}.\n\nComplaint: {{ $('Edit Fields').item.json.complaint }}\nSuggested Reply: {{ $('AI Agent').item.json.suggested_reply }}\n\nClick here to approve:\n{{ $execution.resumeUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        -144
+      ],
+      "id": "c141a54a-7579-455c-bef3-0e722b0e9807",
+      "name": "Send a message",
+      "webhookId": "ece0a5c0-f333-4d61-8e83-7563b4943330",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PRWpeYEnjjJs4Pw9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "khan203221012@gmail.com",
+        "subject": "={{ $('Edit Fields').item.json.customer_email }}",
+        "emailType": "text",
+        "message": "=Dear {{ $('Edit Fields').item.json.body.name }}\n\n{{ $json.output.suggested_reply }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        208
+      ],
+      "id": "602f502f-9785-4266-891e-a84a37aafe09",
+      "name": "Send a message1",
+      "webhookId": "9c4ac566-cb34-4a84-9041-d5ea2dc07404",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PRWpeYEnjjJs4Pw9",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

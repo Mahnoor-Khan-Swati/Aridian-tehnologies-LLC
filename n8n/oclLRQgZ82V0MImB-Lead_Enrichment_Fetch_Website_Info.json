@@ -1,0 +1,203 @@
+{
+  "name": "Lead Enrichment - Fetch Website Info",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "6f5e8442-3b19-487b-afa1-6f70e4199320",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.website.startsWith(\"http\") ? $json.website : \"https://\" + $json.website }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "text",
+              "outputPropertyName": "html"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "cc07d4db-dbc4-4c39-8a4f-5ff8334f0fdf",
+      "name": "Fetch Website",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "html",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "page_title",
+              "cssSelector": "title"
+            },
+            {
+              "key": "meta_description",
+              "cssSelector": "meta[name=\"description\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            },
+            {
+              "key": "h1",
+              "cssSelector": "h1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "13e837a0-1f7c-4f1e-b709-a803bdfbdc37",
+      "name": "Extract Page Info",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        -32
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "company_name",
+              "value": "={{ $(\"When Executed by Another Workflow\").item.json.company_name }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "website",
+              "value": "={{ $(\"When Executed by Another Workflow\").item.json.website }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "contact_name",
+              "value": "={{ $(\"When Executed by Another Workflow\").item.json.contact_name }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "email",
+              "value": "={{ $(\"When Executed by Another Workflow\").item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "Contact Number",
+              "value": "={{ $(\"When Executed by Another Workflow\").item.json[\"Contact Number\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "page_title",
+              "value": "={{ ($json.page_title || \"\").slice(0, 200) }}",
+              "type": "string"
+            },
+            {
+              "id": "a7",
+              "name": "meta_description",
+              "value": "={{ ($json.meta_description || \"\").slice(0, 500) }}",
+              "type": "string"
+            },
+            {
+              "id": "a8",
+              "name": "h1",
+              "value": "={{ ($json.h1 || \"\").slice(0, 200) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2c0a9f2c-192d-4917-8d6f-2a54ea15f51d",
+      "name": "Build Lead Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        -48
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Fetch Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Website": {
+      "main": [
+        [
+          {
+            "node": "Extract Page Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Page Info": {
+      "main": [
+        [
+          {
+            "node": "Build Lead Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": null
+}

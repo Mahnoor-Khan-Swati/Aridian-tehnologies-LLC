@@ -1,0 +1,191 @@
+{
+  "name": "Lead Ingestion and Enrichment",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        32
+      ],
+      "id": "153ca053-454b-4009-b84f-bfb9f3ee3560",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "192ee6b8-5ee5-44f5-bfa9-cdb113021854",
+              "name": "company_name",
+              "value": "={{ $json['Company Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "475cc546-ec9a-4c7f-bff3-89adb6b87a29",
+              "name": "website",
+              "value": "={{ $json.Website }}",
+              "type": "string"
+            },
+            {
+              "id": "72902e7c-6701-4158-9da8-1de4e5b16c67",
+              "name": "contact_name",
+              "value": "={{ $json['Contact Name/Team'] }}",
+              "type": "string"
+            },
+            {
+              "id": "59ab3b21-4a54-49c4-93d0-9bb0e08e9e2d",
+              "name": "email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "c068e48f-09b4-4890-832d-43e4be9ba745",
+              "name": "phone",
+              "value": "={{ $json['Contact Number'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -560,
+        16
+      ],
+      "id": "ee62f70d-ded4-4b16-9f26-c3c03597aeb5",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1e1affa7-1bf9-4cd5-8bb4-7411238f13da",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -368,
+        48
+      ],
+      "id": "f0a29835-196c-42cd-82ca-0a1d66a198b3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.website }}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "b2125d59-ab5a-409d-ad49-d8ee7f0ad3fe",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -736,
+        16
+      ],
+      "id": "f2eb6897-0b30-4ec7-87fd-ceca4d84a5b8",
+      "name": "Create spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "rpZ8uuIESq9jJQOi",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {}
+}

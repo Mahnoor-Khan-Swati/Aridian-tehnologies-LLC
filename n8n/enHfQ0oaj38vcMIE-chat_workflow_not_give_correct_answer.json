@@ -1,0 +1,135 @@
+{
+  "name": "chat workflow not give correct answer",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "hello how i can help you ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Always search Wikipedia before answering factual questions.\nBase factual claims on the information returned by the Wikipedia tool.\nDo NOT invent, assume, or guess information that was not returned by the tool.\nIf Wikipedia does not provide enough information to answer confidently, clearly say: \"I could not verify this information from Wikipedia.\"\nIf the user's question is ambiguous, ask for clarification instead of guessing.\nCheck names, dates, places, numbers, and other important details carefully against the tool result.\nIf Wikipedia provides conflicting or uncertain information, mention the uncertainty rather than choosing an answer without evidence.\nGive a clear and concise answer using simple language.\nWhen appropriate, mention that the information was obtained from Wikipedia.\nNever claim that you searched Wikipedia unless the Wikipedia tool was actually executed."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -352,
+        -192
+      ],
+      "id": "cbe0cf48-0aa1-4834-9ae8-a20ce3b49a3e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        16
+      ],
+      "id": "8a3be9cb-e8e1-4fc8-a6e3-452c3e5d8510",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WGV6T9iHlaK8B1mW",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -752,
+        -64
+      ],
+      "id": "af2f7ff1-7688-4f2c-9764-66662bdb05bd",
+      "name": "When chat message received",
+      "webhookId": "2c0ee1a7-eaad-4fab-a14b-76a2f9ac7b60"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -368,
+        64
+      ],
+      "id": "3e7b95ac-f645-4c92-ac39-f6435014d8fe",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        64
+      ],
+      "id": "84920b7f-7999-4269-a882-eaa0fff28cc7",
+      "name": "Wikipedia"
+    }
+  ],
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

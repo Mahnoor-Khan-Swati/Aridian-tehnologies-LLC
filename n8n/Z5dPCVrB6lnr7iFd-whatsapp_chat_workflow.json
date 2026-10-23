@@ -1,0 +1,360 @@
+{
+  "name": "whatsapp chat workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpYou are a smart food ordering assistant for \"MDA Restaurant\".\n\nRules:\n\n1. When a user sends their first message (like hi, hello), reply with:\n\n\"Welcome to Mahnoor khan Restaurant 👋\nHow can I help you today?\n- 🛒 Place an order\n- ℹ️ FAQ / Information\n- 📦 Check order / stock\"\n\n(👉 Keep the tone friendly like a food delivery app, not like a product e-commerce site.)\n\n2. If user wants *order*:\n- Ask step by step: name, food item, quantity\n- Check Inventory sheet before confirming\n  - If available → \"Your order for *{item}* (x quantity) is confirmed ✅\"\n  - If not available → \"Sorry, *{item}* is out of stock ❌. Available options: [list items]\"\n- Only confirmed orders go into the Orders sheet\n- In Orders sheet always include:\n  Status = Confirmed / Rejected\n  Description = \"Order accepted (item available)\" OR \"Order rejected (out of stock)\"\n\n3. If user wants *FAQ*:\n- Answer short and clear (delivery time, payment method, restaurant hours)\n\n4. If user wants *check order* or *check stock*:\n- Ask for food name or order ID\n- Look up in Google Sheets (Orders / Inventory)\n  - If checking order → reply with status (Confirmed / Rejected / Cancelled / Delivered)\n  - If checking stock → reply with available quantity of that food\n- Also list all *available* food items with quantity if requested\n\n5. If user wants *cancel order*:\n- Reply politely:\n  \"Sorry 🙏 I cannot cancel orders directly.\n  Please call the restaurant owner first and inform them.\"ful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        0,
+        -80
+      ],
+      "id": "0a216eb5-0829-4c4a-af89-b28f0da82879",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        128
+      ],
+      "id": "67dc2783-0678-4a64-9123-012766cb81cf",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "POXzxcBNwFR16AA0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -64,
+        352
+      ],
+      "id": "4e42c1f3-19c2-4615-9555-42e40be235ee",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA",
+          "mode": "list",
+          "cachedResultName": "Food_Delivery_System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 114895781,
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA/edit#gid=114895781"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        176
+      ],
+      "id": "08015f66-60bb-4122-8e80-caed5a24009e",
+      "name": "inventory",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aVWjfVrQQdaKArO4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA",
+          "mode": "list",
+          "cachedResultName": "Food_Delivery_System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1349697063,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA/edit#gid=1349697063"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer_Name', ``, 'string') }}",
+            "Food Item": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Food_Item', ``, 'string') }}",
+            "Quantity Ordered": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity_Ordered', ``, 'string') }}",
+            "Order Date": "={{ $now.format('yyyy-MM-dd hh:mm:ss a') }}",
+            "Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Food Item",
+              "displayName": "Food Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity Ordered",
+              "displayName": "Quantity Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        192
+      ],
+      "id": "7fabcbd7-e076-4a33-b4a2-f43937507030",
+      "name": "order",
+      "notesInFlow": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aVWjfVrQQdaKArO4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA",
+          "mode": "list",
+          "cachedResultName": "Food_Delivery_System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 642315141,
+          "mode": "list",
+          "cachedResultName": "FAQ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10keVsgXj7f6W39HsuOORU8FkdsO78B9HtHEsn_WbjIA/edit#gid=642315141"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        224
+      ],
+      "id": "4189f616-a0e0-4d36-8623-780125b9b595",
+      "name": "FAQ",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aVWjfVrQQdaKArO4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        128,
+        352
+      ],
+      "id": "63d40ad0-caf1-4bfd-8919-a6ac164a5ceb",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "space",
+        "spaceId": "AAQA2boxhpc"
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -48
+      ],
+      "id": "511fff5a-6fa4-418e-ab2c-8f6d2c5a7eb9",
+      "name": "Get a space",
+      "webhookId": "d179e2ce-46d3-459f-aa97-4f4135987659",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "DfrNMXxVudDNoeMm",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "spaceId": "spaces/AAQA2boxhpc",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleChatHitlTool",
+      "typeVersion": 1,
+      "position": [
+        688,
+        256
+      ],
+      "id": "c6c74e55-ebe5-4a18-8bb0-c81c66a15e5f",
+      "name": "Google Chat",
+      "webhookId": "dae17c66-5caa-4a5f-bbf9-a25725f69f57",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "DfrNMXxVudDNoeMm",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cfb375c5-1539-4a13-84d9-16163336e16f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -496,
+        -48
+      ],
+      "id": "3c45959b-4f22-4475-aa7b-a29a4e4de03d",
+      "name": "Webhook",
+      "webhookId": "cfb375c5-1539-4a13-84d9-16163336e16f"
+    }
+  ],
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Get a space",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inventory": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "order": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQ": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

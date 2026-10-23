@@ -1,0 +1,344 @@
+{
+  "name": "AI Book Writer",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        16
+      ],
+      "id": "8ad4039d-e82c-4574-894d-a2132c96bf21",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a detailed chapter plan for this nonfiction book.\n\nBook Title: {{ $('store the basic information about your book').item.json.book_title }}\nSubtitle: {{ $('store the basic information about your book').item.json.subtitle }}\nTarget Audience: {{ $('store the basic information about your book').item.json.audience }}\nGenre: {{ $('store the basic information about your book').item.json.genre }}\n\nCreate 10 chapters.\n\nFor each chapter provide:\n1. Chapter number\n2. Chapter title\n3. Short description of what the chapter will cover\n\nReturn the chapter plan in a clear numbered format.\n\nDo not write the full chapters yet."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "You are a professional nonfiction book planner and editor."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        16
+      ],
+      "id": "a964a03a-1923-4ac2-9250-672bdf812147",
+      "name": "First create the book's roadmap → then divide the roadmap → then write each chapter separately.",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "POXzxcBNwFR16AA0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.6-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.6-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create the front matter for an original nonfiction book.\n\nBook Title: {{ $json.book_title }}\nAuthor: {{ $json.author }}\nSubtitle: {{ $json.subtitle }}\nTarget Audience: {{ $json.audience }}\nGenre: {{ $json.genre }}\n\nCreate these sections:\n\n# Title Page\n# Copyright Page\n# Dedication\n# Author's Note\n# Preface\n# Introduction\n# How to Read This Book\n\nUse clear and professional English.\nWrite original content.\nUse Markdown headings.\nReturn only the completed front matter."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "=You are a professional nonfiction book editor."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        16
+      ],
+      "id": "38085576-5036-4c01-9337-b222af70269d",
+      "name": "Write the beginning/front pages",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "POXzxcBNwFR16AA0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.content.parts[0].text;\n\nconst chapters = text\n  .split(/(?=###\\s+\\*\\*Chapter\\s+\\d+:)/)\n  .map(chapter => chapter.trim())\n  .filter(chapter => chapter.startsWith(\"### **Chapter\"));\n\nreturn chapters.map((chapter, index) => ({\n  json: {\n    chapter_number: index + 1,\n    chapter_plan: chapter\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        16
+      ],
+      "id": "4de6ebeb-50a8-4d4d-a234-2bc8438d47b2",
+      "name": "converting one long Gemini response into 10 separate chapter items."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "773a2b66-1768-480b-9edc-b5b6333a0e07",
+              "name": "book_title",
+              "value": "The 48 Laws of Power: A Modern Guide to Influence, Strategy, and Human Behavior",
+              "type": "string"
+            },
+            {
+              "id": "22bc8991-7c85-4fcf-85cb-607bfdb29763",
+              "name": "author",
+              "value": " Mahnoor Khan",
+              "type": "string"
+            },
+            {
+              "id": "2e282b2a-4a80-40da-9aba-2a94cb94268f",
+              "name": " subtitle",
+              "value": "Understanding Power, Leadership, Strategy, and Human Psychology in the Modern World",
+              "type": "string"
+            },
+            {
+              "id": "be7b5cc5-2328-4326-bb3b-3357b7192b5c",
+              "name": " audience",
+              "value": " University students, professionals, entrepreneurs, managers and leaders",
+              "type": "string"
+            },
+            {
+              "id": "26a89b3e-c851-4154-a45a-4927a69b7ba9",
+              "name": "genre",
+              "value": "Nonfiction / Leadership / Psychology",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -128,
+        16
+      ],
+      "id": "b652ad0d-0e98-453b-9c71-cbaa001612a5",
+      "name": "store the basic information about your book"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        224
+      ],
+      "id": "c38b16fc-2158-46f1-8400-71a065edbc09",
+      "placeholder": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        0
+      ],
+      "id": "0ebfcf54-58a6-4ea2-9f4f-0065ca8f6e79",
+      "name": "will process those chapters one by one."
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.6-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.6-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Write one complete original nonfiction chapter based on the chapter plan below.\n\nChapter Number:\n{{ $json.chapter_number }}\n\nChapter Plan:\n{{ $json.chapter_plan }}\n\nStructure the chapter with:\n\n# Chapter Title\n\n## Introduction\n\n## Main Idea\n\n## Detailed Explanation\n\n## Modern Example\n\n## Practical Application\n\n## Common Mistakes\n\n## Key Lessons\n\n## Chapter Summary\n\nUse clear and professional English.\nWrite original content.\nDo not copy or closely reproduce text from existing books.\nReturn only the completed chapter in Markdown."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "You are a professional nonfiction book writer."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        -112
+      ],
+      "id": "138099e4-0962-42f5-9d62-8bd1a595168c",
+      "name": "check and improve the chapter generated in Step 6",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "POXzxcBNwFR16AA0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me1",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        -32
+      ],
+      "id": "b28950df-8ea9-4cc0-bf06-6d96b6b1a343",
+      "placeholder": true
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2048,
+        -112
+      ],
+      "id": "2f3cb44b-9d57-4432-ba20-2b4780613f23",
+      "name": "Convert to File"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "store the basic information about your book",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write the beginning/front pages": {
+      "main": [
+        [
+          {
+            "node": "First create the book's roadmap → then divide the roadmap → then write each chapter separately.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "First create the book's roadmap → then divide the roadmap → then write each chapter separately.": {
+      "main": [
+        [
+          {
+            "node": "converting one long Gemini response into 10 separate chapter items.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "store the basic information about your book": {
+      "main": [
+        [
+          {
+            "node": "Write the beginning/front pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "converting one long Gemini response into 10 separate chapter items.": {
+      "main": [
+        [
+          {
+            "node": "will process those chapters one by one.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "will process those chapters one by one.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "will process those chapters one by one.": {
+      "main": [
+        [
+          {
+            "node": "check and improve the chapter generated in Step 6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check and improve the chapter generated in Step 6": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

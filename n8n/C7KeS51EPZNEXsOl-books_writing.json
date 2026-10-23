@@ -1,0 +1,854 @@
+{
+  "name": "books writing",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            },
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc",
+          "mode": "list",
+          "cachedResultName": "Book_Generation_Dashboard (1)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 122352651,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc/edit#gid=122352651"
+        },
+        "event": "rowUpdate",
+        "options": {
+          "columnsToWatch": [
+            "notes_on_outline_before"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dd7779ea-f375-4590-9394-610e464a150c",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "fguG02btz559yEGR",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "books",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $('Google Sheets Trigger').item.json.title }}"
+            },
+            {
+              "fieldId": "notes_on_outline_before",
+              "fieldValue": "={{ $('Google Sheets Trigger').item.json.notes_on_outline_before }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "54117cf5-c78e-43ae-acbb-2381c6c50d11",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc",
+          "mode": "list",
+          "cachedResultName": "Book_Generation_Dashboard (1)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 122352651,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc/edit#gid=122352651"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $('Google Sheets Trigger').item.json.title }}",
+            "notes_on_outline_before": "={{ $('Google Sheets Trigger').item.json.notes_on_outline_before }}",
+            "outline": "={{ $('Google Sheets Trigger').item.json.outline }}",
+            "status_outline_notes": "={{ $('Google Sheets Trigger').item.json.status_outline_notes }}",
+            "resume_link": "={{ $('Google Sheets Trigger').item.json.resume_link }}"
+          },
+          "matchingColumns": [
+            "title"
+          ],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "notes_on_outline_before",
+              "displayName": "notes_on_outline_before",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "outline",
+              "displayName": "outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_outline_notes",
+              "displayName": "status_outline_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "resume_link",
+              "displayName": "resume_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        0
+      ],
+      "id": "247bca4d-3d4b-4383-af71-e80be5b3f527",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WN8OZskGP8k0vXio",
+          "name": "Google Sheets account 5"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        -192
+      ],
+      "id": "09e8d82e-d0e2-4c58-954f-904483ec34db",
+      "name": "Wait",
+      "webhookId": "6301ea43-8966-4d0f-9c64-961ac0609be8"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "books",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status_outline_notes",
+              "condition": "eq",
+              "keyValue": "pending"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        -192
+      ],
+      "id": "250ce963-12ec-4381-a838-8e79ac5f24a1",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output",
+              "renameField": true,
+              "outputFieldName": "previous_summaries"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true,
+          "keepMissing": false
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        -80
+      ],
+      "id": "84851dc4-4802-4c3c-af84-c928c79f3658",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ntfy.sh/mahnoor",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": []
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/plain",
+        "body": "=Your book '{{ $('cleaner').first().json.book_title }}' has been saved in the vector store.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3296,
+        -224
+      ],
+      "id": "e78ba228-725d-49ad-bd9a-4d23974771da",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "book_full_text",
+        "options": {
+          "fileName": "={{ $('Google Sheets Trigger').first().json.title }}.txt"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        0
+      ],
+      "id": "91312a9a-4ef5-4b54-97a5-433710e94b33",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the list of chapters from the Aggregate node\nconst chapters = $json.previous_summaries;\n\n// Join them with three new lines and a horizontal rule\nconst fullText = chapters.join('\\n\\n---\\n\\n');\n\nreturn {\n  book_full_text: fullText\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        0
+      ],
+      "id": "c2cf44b6-3971-4b07-9153-954c36689f28",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "book_id"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        2720,
+        0
+      ],
+      "id": "95cb551b-fc51-4096-9e3e-d21c5a6b63cf",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ohxtmxTQOyRseA4m",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "book_id",
+                "value": "={{ $('Create a row').first().json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2976,
+        208
+      ],
+      "id": "a3fb486f-7d22-48f2-a082-b324114c948c",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc",
+          "mode": "list",
+          "cachedResultName": "Book_Generation_Dashboard (1)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 122352651,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15zNIX_GaQWUhFQIzhzxl-61yctCjXqtAGi2x5g9PUOc/edit#gid=122352651"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $('Google Sheets Trigger').first().json.title }}",
+            "notes_on_outline_before": "={{ $('Google Sheets Trigger').first().json.notes_on_outline_before }}",
+            "outline": "Completed"
+          },
+          "matchingColumns": [
+            "title"
+          ],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "notes_on_outline_before",
+              "displayName": "notes_on_outline_before",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "outline",
+              "displayName": "outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_outline_notes",
+              "displayName": "status_outline_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "resume_link",
+              "displayName": "resume_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3472,
+        16
+      ],
+      "id": "ef101427-2725-43bf-9955-3b8c4db536b9",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WN8OZskGP8k0vXio",
+          "name": "Google Sheets account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6a20e3aa-06a9-4eca-baaa-44883ddac8f2",
+              "leftValue": "={{ $json.notes_on_outline_before }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ecd7e2af-6bf4-4b06-9de7-a267037f4f81",
+              "leftValue": "={{ $json.outline }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a6518dfe-428e-4a8f-904e-261d83c0e11c",
+      "name": "checks outline columns"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"You are an expert book architect. Title: {{ $('Google Sheets Trigger').item.json.title }}  Instructions:{{ $('Google Sheets Trigger').item.json.notes_on_outline_before }} . Generate a 10-chapter outline. Format: Chapter [Number]: [Title] - [2 sentence summary].\"",
+        "options": {
+          "systemMessage": "=\"You are an expert book architect. Title: {{ $('Google Sheets Trigger').item.json.title }}  Instructions:{{ $('Google Sheets Trigger').item.json.notes_on_outline_before }} . Generate a 10-chapter outline. Format: Chapter [Number]: [Title] - [2 sentence summary].\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "bf2cdab9-17f0-40c2-bb82-3cb6d4a6baca",
+      "name": "outline content"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\n// Get generated outline directly from the AI node\nconst aiOutline = $('outline content').first().json.output;\n\n// Get current book information\nconst bookData = $('Google Sheets Trigger').first().json;\n\nconst outline = aiOutline;\nconst bookId = $('Create a row').first().json.id || '';\nconst bookTitle = bookData.title || '';\n\n// Check outline\nif (!outline || typeof outline !== 'string') {\n    throw new Error('The outline content node did not return an outline.');\n}\n\n// Remove Markdown formatting\nconst cleanedOutline = outline\n    .replace(/\\*\\*/g, '')\n    .replace(/__/g, '')\n    .replace(/\\r\\n/g, '\\n')\n    .replace(/\\r/g, '\\n')\n    .trim();\n\n// Find each chapter\nconst regex =\n    /Chapter\\s*(\\d+)\\s*:\\s*(.*?)\\s*-\\s*([\\s\\S]*?)(?=Chapter\\s*\\d+\\s*:|$)/gi;\n\nlet match;\n\nwhile ((match = regex.exec(cleanedOutline)) !== null) {\n\n    output.push({\n        json: {\n            book_id: bookId,\n            book_title: bookTitle,\n            chapter_number: Number(match[1]),\n            chapter_title: match[2].trim(),\n            chapter_description: match[3].trim()\n        }\n    });\n}\n\nif (output.length === 0) {\n    throw new Error(\n        'Outline exists, but chapters could not be detected. Check the outline format.'\n    );\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        32
+      ],
+      "id": "61d5b596-ab7b-4355-8146-4a112a1b091b",
+      "name": "cleaner"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"I am writing a book titled:{{ $item(0).$node[\"Google Sheets Trigger\"].json[\"title\"] }}\n\nCurrent Task: > Write the full content for Chapter {{ $json.chapter_number }}: {{ $json.chapter_title }}.\n\nChapter Goal: > {{ $json.chapter_description }}\n\nWriting Requirements:\n\nLength: Approximately 800-1000 words.\n\nUse clear headings where appropriate.\n\nEnsure the content is accurate and engaging.\n\nAt the very end of your response, provide a 2-sentence summary of this chapter for my records, starting with the label 'SUMMARY:'\"",
+        "options": {
+          "systemMessage": "You are an expert non-fiction book author. Your goal is to write high-quality, educational, and engaging book chapters. Write in a clear, professional tone suitable for beginners. Do not repeat the chapter title in the body text."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1744,
+        0
+      ],
+      "id": "1b7e99e3-380c-4ccd-a05b-fe51d0efe3a3",
+      "name": "chapters"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        208
+      ],
+      "id": "c7ee85b7-089c-4b42-9d07-c55cda61b5df",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cQ9mmDhD4u8Xc6b4",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1616,
+        208
+      ],
+      "id": "c17cbcd8-59c0-47a0-a1ea-2cad1b747232",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cQ9mmDhD4u8Xc6b4",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        208
+      ],
+      "id": "0dda1aad-44aa-421d-a3a9-236dff25ede5",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cQ9mmDhD4u8Xc6b4",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        0
+      ],
+      "id": "ab4d5e23-88be-4ca6-b262-b809bea7fa59",
+      "name": "Limit"
+    }
+  ],
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "checks outline columns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "outline content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "cleaner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "cleaner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "checks outline columns": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "outline content": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cleaner": {
+      "main": [
+        [
+          {
+            "node": "chapters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chapters": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "outline content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "chapters",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

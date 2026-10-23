@@ -1,0 +1,65 @@
+{
+  "name": "Lead Pipeline - Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "05f7051b-44c1-414d-a939-a75cb0001728",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "7159398583",
+        "text": "=🚨 LEAD PIPELINE ERROR  Workflow: {{ $json.workflow?.name || 'Unknown workflow' }}  Error: {{ $json.execution?.error?.message || $json.error?.message || 'Unknown error' }}  Execution ID: {{ $json.execution?.id || 'N/A' }}  Time: {{ $now }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d5d6efca-4c24-4578-99a6-fb7781306c41",
+      "name": "Send a text message",
+      "webhookId": "c1ff8fee-92b3-41d2-a7c1-6acc387b9a52",
+      "credentials": {
+        "telegramApi": {
+          "id": "PoX02fAIUxuL9o8Y",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "NlnxeYVKA9He7vMU",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
